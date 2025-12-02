@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+
+  user_manager:
+    build: ./user_manager
+    container_name: user_manager
+    ports:
+      - "8081:8081"
+      - "50051:50051"
+    environment:
+      - DATABASE_URL=postgresql://user:password@userdb:5432/userdb
+    depends_on:
+      - userdb
+
+  data_collector:
+    build: ./data_collector
+    container_name: data_collector
+    ports:
+      - "8082:8082"
+    environment:
+      - DATABASE_URL=postgresql://user:password@datadb:5432/datadb
+      - USER_MANAGER_HOST=user_manager
+      - USER_MANAGER_PORT=50051
+    depends_on:
+      - datadb
+      - user_manager
+
+  userdb:
+    image: postgres:15
+    container_name: userdb
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: userdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - userdb_data:/var/lib/postgresql/data
+
+  datadb:
+    image: postgres:15
+    container_name: datadb
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: datadb
+    ports:
+      - "5434:5432"
+    volumes:
+      - datadb_data:/var/lib/postgresql/data
+
+volumes:
+  userdb_data:
+  datadb_data:

@@ -1,0 +1,17 @@
+syntax = "proto3";
+package user;
+
+service UserService {
+  rpc CheckUser(UserRequest) returns (UserResponse);
+}
+
+message UserRequest {
+  string email = 1;
+}
+
+message UserResponse {
+  bool exists = 1;
+  string email = 2;
+  string fiscal_code = 3;
+  string bank_account = 4;
+}
