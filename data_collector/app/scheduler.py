@@ -79,6 +79,6 @@ def collect_data():
 def start_scheduler():
     logging.info("Avvio scheduler")
     scheduler = BackgroundScheduler()
-    scheduler.add_job(collect_data, "interval", minutes=5)  # in produzione puoi mettere hours=12
+    scheduler.add_job(collect_data, "interval", hours=12)  # in produzione mettere hours=12
     scheduler.start()
     logging.info("Scheduler avviato")

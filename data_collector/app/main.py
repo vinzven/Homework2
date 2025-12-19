@@ -20,9 +20,18 @@ def add_airport():
     data = request.get_json() or {}
     email = data.get("email")
     airport_code = data.get("airport_code")
+    high_value = data.get("high_value")
+    low_value = data.get("low_value")
 
     if not email or not airport_code:
         return {"error": "email and airport_code are required"}, 400
+
+    # Validazione soglie
+    if high_value is not None and low_value is not None:
+        if high_value <= low_value:
+            return {
+                "error": "high_value must be greater than low_value"
+            }, 400
 
     if not grpc_client.check_user(email):
         return {"error": f"User {email} does not exist"}, 404
@@ -31,14 +40,19 @@ def add_airport():
     try:
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO airports(email, airport_code)
-            VALUES (%s, %s)
-        """, (email, airport_code))
+            INSERT INTO airports(email, airport_code, high_value, low_value)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (email, airport_code)
+            DO UPDATE SET
+                high_value = EXCLUDED.high_value,
+                low_value = EXCLUDED.low_value
+        """, (email, airport_code, high_value, low_value))
         conn.commit()
         cur.close()
-        return {"status": "added"}
+        return {"status": "added_or_updated"}
     finally:
         conn.close()
+
 
 @app.delete("/remove_airport")
 def remove_airport():
