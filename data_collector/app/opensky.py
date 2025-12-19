@@ -13,8 +13,8 @@ class OpenSkyClient:
             "opensky-network/protocol/openid-connect/token"
         )
 
-        self.client_id = "cicciopasticcio89-api-client"
-        self.client_secret = "jsDRqroADX6W98izOo6HF0d3b27ZpYUv"
+        self.client_id = client_id
+        self.client_secret = client_secret
         self.token = None
         self.token_expires_at = 0
 
